@@ -17,11 +17,17 @@ class ConverterFragment : BaseFragment<ConverterPresenter>() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
+        getRates()
         return inflater.inflate(R.layout.fragment_converter, container, false)
     }
 
     override fun instantiatePresenter(): ConverterPresenter {
         return ConverterPresenter()
+    }
+
+
+    fun getRates(){
+        presenter.getRates("EUR")
     }
 
 
