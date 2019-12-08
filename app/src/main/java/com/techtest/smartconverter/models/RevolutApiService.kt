@@ -1,5 +1,6 @@
 package com.techtest.smartconverter.models
 
+import com.techtest.smartconverter.di.components.DaggerApiComponent
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -9,6 +10,7 @@ class RevolutApiService {
     lateinit var revolutApi:RevolutApi
 
     init {
+        DaggerApiComponent.create().inject(this)
     }
 
     fun getRates(base:String):Single<RateList>{

@@ -27,7 +27,21 @@ class ConverterFragment : BaseFragment<ConverterPresenter>() {
     }
 
     private fun getRates(base:String,amount:Float){
-        presenter.getRates(base,amount)
+        presenter.refreshAmounts(base,amount)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onViewDestroyed()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.onPause()
+    }
 }

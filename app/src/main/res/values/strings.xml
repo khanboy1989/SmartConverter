@@ -4,4 +4,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_rates">Rates</string>
     <string name="title_converter">Converter</string>
+    <string name="eur">EUR</string>
+    <string name="euro">Euro</string>
 </resources>

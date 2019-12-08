@@ -2,5 +2,6 @@
 <resources>
     <dimen name="toolbarTitleTextSize">20sp</dimen>
     <dimen name="tab_item_text_color">15sp</dimen>
+    <dimen name="detail_text_size">14sp</dimen>
 
 </resources>

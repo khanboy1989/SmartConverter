@@ -18,4 +18,15 @@
         <item name="android:textSize">@dimen/tab_item_text_color</item>
     </style>
 
+    <style name="curr_detail_text" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">@dimen/detail_text_size</item>
+        <item name="android:textColor">@color/curr_label_detail_text_color</item>
+    </style>
+
+    <style name="curr_text" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/curr_label_text_color</item>
+    </style>
 </resources>
