@@ -1,42 +1,51 @@
 package com.techtest.smartconverter.presenters
 
 import android.annotation.SuppressLint
-import android.util.Log
-import com.techtest.smartconverter.di.components.DaggerPresenterComponent
 import com.techtest.smartconverter.models.RateList
-import com.techtest.smartconverter.repository.RatesRepository
+import com.techtest.smartconverter.models.RevolutApiService
 import com.techtest.smartconverter.ui.base.BasePresenter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
-class ConverterPresenter:BasePresenter() {
+class ConverterPresenter : BasePresenter() {
 
     private var TAG = ConverterPresenter::class.java.simpleName
 
     @Inject
-    lateinit var repository:RatesRepository
+    lateinit var service: RevolutApiService
 
-    init {
-        DaggerPresenterComponent.builder().build().inject(this)
+
+    fun refreshAmounts(base:String,amount:Float){
+        getRates(base,amount)
     }
 
     @SuppressLint("CheckResult")
-    fun getRates(base:String){
-        Log.d(TAG,"presenter get rates")
-        repository.getRates(base).observeOn(AndroidSchedulers.mainThread())
+    private fun getRates(base: String,amount:Float) {
+        service.getRates(base).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.newThread())
-            .subscribeWith(object: DisposableSingleObserver<RateList>(){
+            .subscribeWith(object : DisposableSingleObserver<RateList>() {
                 override fun onSuccess(t: RateList) {
-                    Log.d(TAG,"onSuccess" + t.toString())
+                    print(t.toString())
                 }
 
                 override fun onError(e: Throwable) {
-                    Log.d(TAG,"onError" + e.localizedMessage)
-
+                    e.printStackTrace()
                 }
 
             })
+    }
+
+
+    override fun onViewCreated() {
+    }
+
+    override fun onViewDestroyed() {
+
+    }
+
+    override fun onPause() {
+
     }
 }

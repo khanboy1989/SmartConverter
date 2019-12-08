@@ -1,8 +1,8 @@
 package com.techtest.smartconverter.ui.fragment
 
 
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import com.techtest.smartconverter.R
 import com.techtest.smartconverter.presenters.ConverterPresenter
 import com.techtest.smartconverter.ui.base.BaseFragment
+import com.techtest.smartconverter.util.Constants
 
 
 class ConverterFragment : BaseFragment<ConverterPresenter>() {
@@ -17,7 +18,7 @@ class ConverterFragment : BaseFragment<ConverterPresenter>() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
-        getRates()
+        getRates(Constants.DEFAULT_SYMBOL,Constants.DEFAULT_AMOUNT)
         return inflater.inflate(R.layout.fragment_converter, container, false)
     }
 
@@ -25,10 +26,8 @@ class ConverterFragment : BaseFragment<ConverterPresenter>() {
         return ConverterPresenter()
     }
 
-
-    fun getRates(){
-        presenter.getRates("EUR")
+    private fun getRates(base:String,amount:Float){
+        presenter.getRates(base,amount)
     }
-
 
 }
