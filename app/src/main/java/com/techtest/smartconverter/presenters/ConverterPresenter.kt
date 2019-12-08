@@ -29,6 +29,9 @@ class ConverterPresenter : BasePresenter() {
     @Inject
     lateinit var service: RevolutApiService
 
+    /***
+     * initialize the dagger component and inject the dependecies
+     */
     init {
         DaggerPresenterComponent.create().inject(this)
     }
@@ -60,9 +63,12 @@ class ConverterPresenter : BasePresenter() {
             .subscribeOn(Schedulers.newThread())
             .repeatUntil { !base.equals(Constants.DEFAULT_SYMBOL, ignoreCase = true) }
             .subscribe({
-                Log.d(TAG,it.toString())
+                loading.value = false
+                loadError.value = false
             },{
-                Log.d(TAG,it.localizedMessage)
+                it.printStackTrace()
+                loading.value = false
+                loadError.value = true
             }))
     }
 

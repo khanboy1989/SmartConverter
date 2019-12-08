@@ -13,6 +13,8 @@ import io.reactivex.Single
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
+import io.reactivex.schedulers.TestScheduler
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,6 +25,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.concurrent.Callable
 import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
 class ConverterPresenterTest {
@@ -32,6 +35,8 @@ class ConverterPresenterTest {
 
     @Mock
     lateinit var revolutApiService:RevolutApiService
+
+    lateinit var testScheduler: TestScheduler
 
     var presenter = ConverterPresenter()
 
@@ -51,8 +56,11 @@ class ConverterPresenterTest {
             }
         }
 
-        RxJavaPlugins.setInitNewThreadSchedulerHandler{ t: Callable<Scheduler> -> immidiate  }
-        RxAndroidPlugins.setInitMainThreadSchedulerHandler { t: Callable<Scheduler> ->  immidiate}
+        testScheduler = TestScheduler()
+        RxJavaPlugins.setComputationSchedulerHandler { testScheduler }
+
+        RxJavaPlugins.setInitNewThreadSchedulerHandler{ t: Callable<Scheduler> -> testScheduler  }
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { t: Callable<Scheduler> ->  testScheduler}
     }
 
 
@@ -68,9 +76,17 @@ class ConverterPresenterTest {
 
         val testSingle = Single.just(ratesList)
 
-        Mockito.`when`(revolutApiService.getRates(Constants.DEFAULT_SYMBOL)).thenReturn(testSingle)
+        Mockito.`when`(revolutApiService.getRates(Constants.DEFAULT_SYMBOL))
+            .thenReturn(testSingle)
+
 
         presenter.refreshAmounts(Constants.DEFAULT_SYMBOL,1.0F)
+
+        testScheduler.advanceTimeBy(1,TimeUnit.SECONDS)
+
+
+        Assert.assertEquals(false,presenter.loadError.value)
+        Assert.assertEquals(false,presenter.loading.value)
 
     }
 }
