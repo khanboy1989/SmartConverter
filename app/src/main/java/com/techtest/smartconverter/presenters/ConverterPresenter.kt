@@ -63,8 +63,13 @@ class ConverterPresenter : BasePresenter() {
             .subscribeOn(Schedulers.newThread())
             .repeatUntil { !base.equals(Constants.DEFAULT_SYMBOL, ignoreCase = true) }
             .subscribe({
+                val rates = ArrayList<Rate>()
+                rates.add(Rate(it.base,Constants.DEFAULT_AMOUNT))
+                rates.addAll(it.rates.map{Rate(it.key,it.value)})
+                this.rates.value = rates
                 loading.value = false
                 loadError.value = false
+
             },{
                 it.printStackTrace()
                 loading.value = false
