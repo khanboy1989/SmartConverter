@@ -12,15 +12,16 @@ import com.techtest.smartconverter.R
 import com.techtest.smartconverter.models.Rate
 import com.techtest.smartconverter.presenters.ConverterPresenter
 import com.techtest.smartconverter.ui.adapter.CurrencyListAdapter
+import com.techtest.smartconverter.ui.adapter.OnAmountChangedListener
 import com.techtest.smartconverter.ui.base.BaseFragment
 import com.techtest.smartconverter.util.Constants
 import kotlinx.android.synthetic.main.fragment_converter.view.*
 
 
-class ConverterFragment : BaseFragment<ConverterPresenter>() {
+class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedListener {
 
     private lateinit var rootView:View
-    private  val adapter = CurrencyListAdapter()
+    private lateinit var adapter:CurrencyListAdapter
     private val TAG = ConverterFragment::class.java.simpleName
 
     override fun onCreateView(
@@ -35,6 +36,7 @@ class ConverterFragment : BaseFragment<ConverterPresenter>() {
 
 
     private fun initRecycler(){
+        adapter = CurrencyListAdapter(this)
         rootView.currencyRecyclerView.adapter = adapter
         rootView.currencyRecyclerView.addItemDecoration(DividerItemDecoration(rootView.currencyRecyclerView.context,DividerItemDecoration.VERTICAL))
     }
@@ -65,6 +67,11 @@ class ConverterFragment : BaseFragment<ConverterPresenter>() {
         super.onPause()
         presenter.onPause()
     }
+
+    override fun onAmountChanged(symbol: String, amount: Float) {
+        presenter.refreshAmounts(symbol,amount)
+    }
+
 
     //<--------- Observers -------------->
     private val currencyRateObserver = Observer<List<Rate>> {

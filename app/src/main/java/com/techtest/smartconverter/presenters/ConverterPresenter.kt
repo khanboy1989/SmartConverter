@@ -20,11 +20,10 @@ class ConverterPresenter : BasePresenter() {
 
     private var TAG = ConverterPresenter::class.java.simpleName
 
-
+    //<----------Observable variables ------------>
     val loadError by lazy {MutableLiveData<Boolean>()}
     val loading by lazy {MutableLiveData<Boolean>()}
     val rates by lazy {MutableLiveData<List<Rate>>()}
-
 
     @Inject
     lateinit var service: RevolutApiService
