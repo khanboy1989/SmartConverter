@@ -29,4 +29,9 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/curr_label_text_color</item>
     </style>
+
+
+    <style name="RedAccent" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorAccent">#F00</item>
+    </style>
 </resources>

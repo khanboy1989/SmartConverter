@@ -3,15 +3,13 @@ package com.techtest.smartconverter
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.techtest.smartconverter.di.ApiModuleTest
 import com.techtest.smartconverter.di.components.DaggerPresenterComponent
-import com.techtest.smartconverter.models.Rate
 import com.techtest.smartconverter.models.RateList
 import com.techtest.smartconverter.models.RevolutApiService
-import com.techtest.smartconverter.presenters.ConverterPresenter
+import com.techtest.smartconverter.ui.presenters.ConverterPresenter
 import com.techtest.smartconverter.util.Constants
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.TestScheduler
 import org.junit.Assert
@@ -24,7 +22,6 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 import java.util.concurrent.Callable
-import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
 @RunWith(MockitoJUnitRunner::class)
@@ -50,12 +47,6 @@ class ConverterPresenterTest {
 
     @Before
     fun setupRxSchedulers(){
-        val immidiate = object: Scheduler(){
-            override fun createWorker(): Worker {
-                return ExecutorScheduler.ExecutorWorker(Executor { it.run() },true)
-            }
-        }
-
         testScheduler = TestScheduler()
         RxJavaPlugins.setComputationSchedulerHandler { testScheduler }
 
@@ -80,7 +71,7 @@ class ConverterPresenterTest {
             .thenReturn(testSingle)
 
 
-        presenter.refreshAmounts(Constants.DEFAULT_SYMBOL,1.0F)
+        presenter.refreshBaseAndAmount(Constants.DEFAULT_SYMBOL,1.0F)
 
         testScheduler.advanceTimeBy(1,TimeUnit.SECONDS)
 

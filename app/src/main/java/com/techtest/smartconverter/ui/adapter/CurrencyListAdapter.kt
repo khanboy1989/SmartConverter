@@ -18,8 +18,11 @@ class CurrencyListAdapter(private val onAmountChangedListener: OnAmountChangedLi
 
     private val items = mutableListOf<Rate>()
     private var amount:Float = 1.0F
+    private var symbol:String = ""
     private val TAG = CurrencyListAdapter::class.java.simpleName
+
     fun refreshData(rateList:List<Rate>){
+        this.symbol = rateList[0].symbol
         this.items.clear()
         this.items.addAll(rateList)
         notifyItemRangeChanged(0, items.size - 1, amount)
@@ -35,6 +38,10 @@ class CurrencyListAdapter(private val onAmountChangedListener: OnAmountChangedLi
         holder.bindData(items[position])
     }
 
+    fun updateAmount(amount:Float){
+        this.amount = amount
+        notifyItemRangeChanged(0, items.size - 1, amount)
+    }
 
     /**
      * CurrencyListViewHolder for the currencies
@@ -47,16 +54,24 @@ class CurrencyListAdapter(private val onAmountChangedListener: OnAmountChangedLi
         private val currencyTextView  = itemView.currencyTV
         private val currencyFlag = itemView.currencyFlagIV
 
-        fun bindData(item:Rate){
+        fun bindData(item:Rate) {
             currencyTextView.text = item.symbol
-            val curFlagId = getCurrencyFlagResId(this.itemView.context,item.symbol.toLowerCase())
-            val curNameResId = getCurrencyNameResId(this.itemView.context,item.symbol.toLowerCase())
+            val curFlagId = getCurrencyFlagResId(this.itemView.context, item.symbol.toLowerCase())
+            val curNameResId =
+                getCurrencyNameResId(this.itemView.context, item.symbol.toLowerCase())
             currencyFlag.setImageResource(curFlagId)
             currecyDetailTextView.text = this.itemView.context.getString(curNameResId)
             amountEditText.addTextChangedListener(this)
 
-            if (!amountEditText.isFocused){
+            if (!amountEditText.isFocused) {
                 amountEditText.setText((item.rate * amount).format())
+            }
+
+            amountEditText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                //If view lost focus, we do nothing
+                if (!hasFocus) {
+                    return@OnFocusChangeListener
+                }
             }
         }
 
@@ -68,9 +83,10 @@ class CurrencyListAdapter(private val onAmountChangedListener: OnAmountChangedLi
         }
 
         override fun onTextChanged(string: CharSequence?, start: Int, before: Int, count: Int) {
-            if(string.toString().isNullOrEmpty()){
+            if(!string.toString().isNullOrEmpty()){
                 if(amountEditText.isFocused){
                     Log.d(TAG,string.toString())
+                    onAmountChangedListener.onAmountChanged(symbol,string.toString().toFloat())
                 }
             }
         }

@@ -43,5 +43,6 @@
     <string name="currency_try_name">Turkish lira</string>
     <string name="currency_usd_name">United States dollar</string>
     <string name="currency_zar_name">South African rand</string>
+    <string name="an_error_occurred">An error occured while loading data</string>
 
 </resources>

@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.techtest.smartconverter.R
 import com.techtest.smartconverter.models.Rate
-import com.techtest.smartconverter.presenters.ConverterPresenter
+import com.techtest.smartconverter.ui.presenters.ConverterPresenter
 import com.techtest.smartconverter.ui.adapter.CurrencyListAdapter
 import com.techtest.smartconverter.ui.adapter.OnAmountChangedListener
 import com.techtest.smartconverter.ui.base.BaseFragment
@@ -18,7 +18,7 @@ import com.techtest.smartconverter.util.Constants
 import kotlinx.android.synthetic.main.fragment_converter.view.*
 
 
-class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedListener {
+class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedListener,ConvertView {
 
     private lateinit var rootView:View
     private lateinit var adapter:CurrencyListAdapter
@@ -43,14 +43,20 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
 
     private fun initObservers(){
         presenter.rates.observe(this,currencyRateObserver)
+        presenter.loading.observe(this,loadingProgressObserver)
     }
 
     override fun instantiatePresenter(): ConverterPresenter {
-        return ConverterPresenter()
+        return ConverterPresenter(this)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
     }
 
     private fun getRates(base:String,amount:Float){
-        presenter.refreshAmounts(base,amount)
+        presenter.refreshBaseAndAmount(base,amount)
     }
 
     override fun onDestroy() {
@@ -68,17 +74,42 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
         presenter.onPause()
     }
 
+    /**
+     *Getting called by adapter and updates the amount on presenter checks
+     * if amount and base (currency) has changed
+     */
     override fun onAmountChanged(symbol: String, amount: Float) {
-        presenter.refreshAmounts(symbol,amount)
+        presenter.refreshBaseAndAmount(symbol,amount)
     }
 
+    /**
+     *Getting called by presenter in order to update
+     * the amount and change the values of each row
+     */
+    override fun updateAmount(amount: Float) {
+        adapter.updateAmount(amount)
+    }
 
     //<--------- Observers -------------->
     private val currencyRateObserver = Observer<List<Rate>> {
         it?.let{
-            Log.d(TAG,it.toString())
+            rootView.currencyRecyclerView.visibility = View.VISIBLE
             adapter.refreshData(it)
         }
+    }
 
+    private val loadingProgressObserver = Observer<Boolean>{isLoading->
+        if(isLoading){
+            rootView.loadingView.visibility = View.VISIBLE
+            rootView.currencyRecyclerView.visibility = View.GONE
+        }else{
+            rootView.loadingView.visibility = View.GONE
+        }
+    }
+
+
+    companion object{
+        const val AMOUNT_KEY = "amount_key"
+        const val CURRENCY_KEY = "currency_key"
     }
 }

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import io.reactivex.disposables.CompositeDisposable
 
-abstract class BaseFragment<P: BasePresenter>:Fragment() {
+abstract class BaseFragment<P: BasePresenter<BaseView>>:Fragment() {
 
     protected lateinit var presenter:P
     protected var disposable:CompositeDisposable = CompositeDisposable()
