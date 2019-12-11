@@ -9,7 +9,7 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [ApiModule::class])
 interface PresenterComponent {
-
+    //inject RevolutApiService into ConverterPresenter
     fun inject(presenter:ConverterPresenter)
 }
 

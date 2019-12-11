@@ -6,6 +6,8 @@ import com.techtest.smartconverter.R
 import com.techtest.smartconverter.ui.adapter.TabBarFragmentAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
+
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var tabsAdapter:TabBarFragmentAdapter
@@ -15,11 +17,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initializeTabs()
     }
-
+    //initialize the tabbar fragment
     private fun initializeTabs(){
         tabsAdapter = TabBarFragmentAdapter(this,supportFragmentManager)
         mainViewPager.adapter = tabsAdapter
         tabLayout.setupWithViewPager(mainViewPager)
         mainViewPager.currentItem = 1
     }
+
 }

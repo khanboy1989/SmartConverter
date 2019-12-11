@@ -9,6 +9,6 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [ApiModule::class])
 interface ApiComponent {
-
+    //inject the RevolutApi class into RevolutApiService
     fun inject(service:RevolutApiService)
 }

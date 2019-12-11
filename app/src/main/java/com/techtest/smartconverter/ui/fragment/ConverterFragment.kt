@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.techtest.smartconverter.R
 import com.techtest.smartconverter.models.Rate
+import com.techtest.smartconverter.ui.activity.MainActivity
 import com.techtest.smartconverter.ui.presenters.ConverterPresenter
 import com.techtest.smartconverter.ui.adapter.CurrencyListAdapter
 import com.techtest.smartconverter.ui.adapter.OnAmountChangedListener
@@ -35,43 +36,48 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
     }
 
 
+    /***
+     * Initialize the Recycler in first launch
+     */
     private fun initRecycler(){
         adapter = CurrencyListAdapter(this)
         rootView.currencyRecyclerView.adapter = adapter
         rootView.currencyRecyclerView.addItemDecoration(DividerItemDecoration(rootView.currencyRecyclerView.context,DividerItemDecoration.VERTICAL))
     }
 
+    //Init observers for LiveData from presenter
     private fun initObservers(){
         presenter.rates.observe(this,currencyRateObserver)
         presenter.loading.observe(this,loadingProgressObserver)
     }
 
+    //Initialize the presenter of the fragment
     override fun instantiatePresenter(): ConverterPresenter {
         return ConverterPresenter(this)
     }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-    }
-
+    //Initial method when fragment created get the rates with default values
     private fun getRates(base:String,amount:Float){
         presenter.refreshBaseAndAmount(base,amount)
     }
-
+    //onDestroy call presenter to stop disposable
     override fun onDestroy() {
         super.onDestroy()
         presenter.onViewDestroyed()
     }
-
+    //onStop
     override fun onStop() {
         super.onStop()
         presenter.onStop()
     }
-
+    //onPause
     override fun onPause() {
         super.onPause()
         presenter.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.onResume()
     }
 
     /**
@@ -91,8 +97,9 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
     }
 
     //<--------- Observers -------------->
-    private val currencyRateObserver = Observer<List<Rate>> {
+    private val currencyRateObserver = Observer<ArrayList<Rate>> {
         it?.let{
+            Log.d(TAG,it.toString())
             rootView.currencyRecyclerView.visibility = View.VISIBLE
             adapter.refreshData(it)
         }
@@ -107,9 +114,4 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
         }
     }
 
-
-    companion object{
-        const val AMOUNT_KEY = "amount_key"
-        const val CURRENCY_KEY = "currency_key"
-    }
 }

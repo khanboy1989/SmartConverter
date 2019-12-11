@@ -10,6 +10,6 @@ abstract class BasePresenter<out V:BaseView>(protected val view:V) {
     open fun onViewDestroyed(){}
     open fun onPause(){}
     open fun onStop(){}
-
+    open fun onResume(){}
 
 }

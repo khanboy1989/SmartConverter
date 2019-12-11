@@ -21,10 +21,10 @@ class ConverterPresenter(private val convertView: ConvertView) : BasePresenter<C
     //<----------Observable variables ------------>
     val loadError by lazy { MutableLiveData<Boolean>() }
     val loading by lazy { MutableLiveData<Boolean>() }
-    val rates by lazy { MutableLiveData<List<Rate>>() }
+    val rates by lazy { MutableLiveData<ArrayList<Rate>>() }
 
-    private var base: String = ""
-    private var amount: Float = 1.0F
+    var base: String = ""
+    private var isLoadedDefaultBase = false
 
     //inject the RevolutApiService from Presenter Component
     @Inject
@@ -41,40 +41,33 @@ class ConverterPresenter(private val convertView: ConvertView) : BasePresenter<C
      * Refresh amounts function is entry point for getting the rates
      * @param base : currency requested by user(initially default currency is passed)
      * @param amount : amount (initially default amount is passed)
+     * If previous and current base is equal just update the amount calculation
+     * If base is not changed we simply update the rates depending on new amount
      */
     fun refreshBaseAndAmount(base: String, amount: Float) {
-        this.amount = amount
-        when (this.base == base) {
-            true -> {
-                this.amount = amount
-                convertView.updateAmount(this.amount)
-            }
-            false -> {
-                this.base = base.toUpperCase()
-                rates.value = null
-                loadError.value = false
-                loading.value = true
-                this.base = base
-                this.amount = amount
-                getRates(base, amount)
-            }
+        //if there is an letter upper or lower case ignore and check if the values are equal
+        if(base.equals(this.base,ignoreCase = true)){
+            convertView.updateAmount(amount)
+        }else {
+            this.base = base.toUpperCase()
+            loadError.value = false
+            loading.value = !isLoadedDefaultBase
+            this.rates.value = null
+            getRates(this.base)
         }
-
-
     }
 
     /**
-     * GetRates get rates function gets value for DEFAULT CURRENCY AND AMOUNT
+     * get rates function gets value for DEFAULT CURRENCY AND AMOUNT (initially)
+     * when base(currency) has changed the new currency request is being made
      * @param base:currency
-     * @param amount: that is requested by user
      * */
-    @SuppressLint("CheckResult")
-    private fun getRates(base: String, amount: Float) {
+    private fun getRates(base: String) {
         disposable.add(service.getRates(base)
             .delay(Constants.RATE_REFRESH_FREQUENCY, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.newThread())
-            .repeatUntil { !base.equals(Constants.DEFAULT_SYMBOL, ignoreCase = true) }
+            .repeatUntil { !base.equals(this.base, ignoreCase = true) }
             .subscribe({
                 val rates = ArrayList<Rate>()
                 rates.add(Rate(it.base, Constants.DEFAULT_AMOUNT))
@@ -82,7 +75,7 @@ class ConverterPresenter(private val convertView: ConvertView) : BasePresenter<C
                 this.rates.value = rates
                 loading.value = false
                 loadError.value = false
-
+                isLoadedDefaultBase = true
             }, {
                 it.printStackTrace()
                 loading.value = false
@@ -104,7 +97,7 @@ class ConverterPresenter(private val convertView: ConvertView) : BasePresenter<C
      * at the background
      */
     override fun onViewDestroyed() {
-        disposable.dispose()
+        disposable.clear()
     }
 
     /**
@@ -112,10 +105,22 @@ class ConverterPresenter(private val convertView: ConvertView) : BasePresenter<C
      * dispose the disposable
      */
     override fun onPause() {
-        disposable.dispose()
+        disposable.clear()
     }
 
+    /**
+     *onStop dispose the disposables so that application won't make any request
+     */
     override fun onStop() {
         disposable.clear()
+    }
+
+    /**
+     * OnResume update the list once more with default values
+     */
+    override fun onResume() {
+        base = ""
+        isLoadedDefaultBase = false
+        refreshBaseAndAmount(Constants.DEFAULT_SYMBOL,Constants.DEFAULT_AMOUNT)
     }
 }
