@@ -49,6 +49,7 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
     private fun initObservers(){
         presenter.rates.observe(this,currencyRateObserver)
         presenter.loading.observe(this,loadingProgressObserver)
+        presenter.loadError.observe(this,loadErrorObserver)
     }
 
     //Initialize the presenter of the fragment
@@ -99,7 +100,6 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
     //<--------- Observers -------------->
     private val currencyRateObserver = Observer<ArrayList<Rate>> {
         it?.let{
-            Log.d(TAG,it.toString())
             rootView.currencyRecyclerView.visibility = View.VISIBLE
             adapter.refreshData(it)
         }
@@ -107,10 +107,19 @@ class ConverterFragment : BaseFragment<ConverterPresenter>(), OnAmountChangedLis
 
     private val loadingProgressObserver = Observer<Boolean>{isLoading->
         if(isLoading){
+            rootView.listError.visibility = View.GONE
             rootView.loadingView.visibility = View.VISIBLE
             rootView.currencyRecyclerView.visibility = View.GONE
         }else{
             rootView.loadingView.visibility = View.GONE
+        }
+    }
+
+    private val loadErrorObserver = Observer<Boolean> {isError->
+        if(isError){
+            rootView.loadingView.visibility = View.GONE
+            rootView.currencyRecyclerView.visibility = View.GONE
+            rootView.listError.visibility = View.VISIBLE
         }
     }
 
